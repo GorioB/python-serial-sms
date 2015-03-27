@@ -6,12 +6,12 @@ from sparse import sparse
 class smserver(): 
     def __init__(self):
         try:
-            self.ser = serial.Serial("COM11",9800,timeout=2)
+            self.ser = serial.Serial("COM5",9800,timeout=2)
             self.ser.write("AT+CMGF=1\r\n")
             print "Connected"
 
-        except:
-            print "Some kind of failure"
+        except Exception,e:
+            print str(e)
 
 
     def getmsg(self):
