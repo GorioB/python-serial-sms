@@ -10,8 +10,8 @@ class smserver():
             self.ser.write("AT+CMGF=1\r\n")
             print "Connected"
 
-        except:
-            print "Some kind of failure"
+        except Exception,e:
+            print str(e)
 
 
     def getmsg(self):
