@@ -17,7 +17,7 @@ def sparse(d):
 
     return r
 
-class smserver(object): 
+class SMServer(object): 
     def __init__(self,device):
         self.ser=None
         self.device = device
@@ -72,7 +72,7 @@ class smserver(object):
             n = raw_input("")
 
 if __name__ == "__main__":
-    s = smserver("/dev/ttyUSB0")
+    s = SMServer("/dev/ttyUSB0")
     while not s.connect():
         time.sleep(2)
     s.run()
