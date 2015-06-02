@@ -17,7 +17,7 @@ def sparse(d):
 
     return r
 
-class smserver(): 
+class smserver(object): 
     def __init__(self,device):
         self.ser=None
         self.device = device
