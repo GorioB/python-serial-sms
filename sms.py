@@ -8,12 +8,10 @@ def sparse(d):
     e = d.splitlines()
     for i in e:
         if i[0:5] == "+CMGL":
-            print i
             f.append(re.search("\+[0-9]{12}",i).group(0))
             
         else:
             f.append(i)
-            print f
             r.append(f)
             f = []
 
@@ -38,7 +36,13 @@ class smserver():
     def getMessage(self):
         self.ser.write('AT+CMGL="REC UNREAD"\r\n')
         s = self.ser.read(500)
-        return s
+        s = s[s.find('AT+CMGL="REC UNREAD"')+len('AT+CMGL="REC UNREAD"   '):]
+        if s.find("REC UNREAD")!=-1:
+            s = s[:s.find("\r\nOK\r")-1]
+            parsetring = sparse(s)
+            return parsestring
+
+        return []
 
     def sendMessage(self,number,message):
         self.ser.write('AT+CMGS="'+number+'"\r\n')
@@ -54,17 +58,14 @@ class smserver():
     		print "[+] Server running."
 	        while(1):
 	            s = self.getMessage()
-	            s = s[s.find('AT+CMGL="REC UNREAD"')+len('AT+CMGL="REC UNREAD"   '):]
-	            if s.find("REC UNREAD")!=-1:
-	                s = s[:s.find("\r\nOK\r")-1]
-	                parsetring = sparse(s)
-	                print i[1]
-	                for i in parsetring:
+	            if s:
+	                for i in s:
+                        print "[+] Message received: "+i[1]
 	                    self.sendMessage(i[0],"Your message: "+i[1])
-
 	            else:
 	                print "[*] No message. Waiting 2s"
 	                time.sleep(2)
+
         except KeyboardInterrupt:
             print "[+] Interrupt received. Press enter to shut down."
             self.killser()
