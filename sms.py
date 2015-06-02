@@ -21,14 +21,19 @@ def sparse(d):
 
 class smserver(): 
     def __init__(self,device):
+        self.ser=None
+        self.device = device
+
+    def connect(self):
         try:
-            self.ser = serial.Serial(device,9800,timeout=2)
+            self.ser = serial.Serial(self.device,9800,timeout=2)
             self.ser.write("AT+CMGF=1\r\n")
-            print "Connected"
+            print "[+] Connected"
+            return True
 
         except Exception,e:
-            print str(e)
-
+            print "[-] "+str(e)
+            return False
 
     def getMessage(self):
         self.ser.write('AT+CMGL="REC UNREAD"\r\n')
@@ -39,14 +44,14 @@ class smserver():
         self.ser.write('AT+CMGS="'+number+'"\r\n')
         self.ser.write(message)
         self.ser.write(chr(26))
-        print "Message Sent"
+        print "[+] Message Sent"
 
     def kill(self):
         self.ser.close()
 
     def run(self):
     	try:
-    		print "Server running."
+    		print "[+] Server running."
 	        while(1):
 	            s = self.getMessage()
 	            s = s[s.find('AT+CMGL="REC UNREAD"')+len('AT+CMGL="REC UNREAD"   '):]
@@ -58,14 +63,16 @@ class smserver():
 	                    self.sendMessage(i[0],"Your message: "+i[1])
 
 	            else:
-	                print "No message. Waiting 2s"
+	                print "[*] No message. Waiting 2s"
 	                time.sleep(2)
         except KeyboardInterrupt:
-            print "Interrupt received. Press enter to shut down."
+            print "[+] Interrupt received. Press enter to shut down."
             self.killser()
             n = raw_input("")
 
 if __name__ == "__main__":
     s = smserver("/dev/ttyUSB0")
+    while not s.connect():
+        time.sleep(2)
     s.run()
 
