@@ -19,10 +19,12 @@ def sparse(d):
 
 class SMServer(object): 
     def __init__(self,device):
+        """ Initializes the server object and device for serial to try to connect to """
         self.ser=None
         self.device = device
 
     def connect(self):
+        """ Initialize serial connection and send command to GSM modem to start communication. Returns True on success and False on any exception. """
         try:
             self.ser = serial.Serial(self.device,9800,timeout=2)
             self.ser.write("AT+CMGF=1\r\n")
@@ -34,6 +36,7 @@ class SMServer(object):
             return False
 
     def getMessage(self):
+        """ Returns list of [sender number,message] pairs"""
         self.ser.write('AT+CMGL="REC UNREAD"\r\n')
         s = self.ser.read(500)
         s = s[s.find('AT+CMGL="REC UNREAD"')+len('AT+CMGL="REC UNREAD"   '):]
@@ -45,15 +48,18 @@ class SMServer(object):
         return []
 
     def sendMessage(self,number,message):
+        """ Send message to number. Doesn't check if sending is successful """
         self.ser.write('AT+CMGS="'+number+'"\r\n')
         self.ser.write(message)
         self.ser.write(chr(26))
         print "[+] Message Sent"
 
     def kill(self):
+        """ Close Serial communication """
         self.ser.close()
 
     def run(self):
+        """ Continuously checks for new messages and responds with 'Your message: <message>'. Quit with CTRL+C """
     	try:
     		print "[+] Server running."
 	        while(1):
